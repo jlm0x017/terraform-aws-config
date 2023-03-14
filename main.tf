@@ -52,6 +52,17 @@ resource "aws_config_config_rule" "rules" {
     source_identifier = each.value.identifier
   }
 
+  dynamic "scope" {
+    for_each = each.value.scope ? each.value.scope : {}
+
+    content {
+      compliance_resource_id    = scope.value.compliance_resource_id
+      compliance_resource_types = scope.compliance_resource_types
+      tag_key                   = scope.tag_key
+      tag_value                 = scope.tag_value
+    }
+  }
+
   input_parameters = length(each.value.input_parameters) > 0 ? jsonencode(each.value.input_parameters) : null
   tags             = merge(module.this.tags, each.value.tags)
 }
